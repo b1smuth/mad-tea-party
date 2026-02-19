@@ -4,108 +4,24 @@
 <meta charset="UTF-8">
 <title>Схема відділення</title>
 <style>
-body {
-    font-family: Arial;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-h1 {
-    text-align: center;
-    margin-top: 20px;
-}
-.legend {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.legend span {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    vertical-align: middle;
-    border: 1px solid #000;
-}
-.floor {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    margin-bottom: 50px;
-    padding: 0 10px;
-}
-.ward-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.room {
-    border: 2px solid #555;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 120px;
-    flex: 1 1 120px;
-    max-width: 150px;
-    box-sizing: border-box;
-}
-.room-title {
-    text-align: center;
-    font-weight: bold;
-}
-.beds {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-.bed {
-    height: 40px;
-    border: 2px solid #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background-color: lightgreen;
-    font-weight: bold;
-    border-radius: 5px;
-}
-.occupied {
-    background-color: lightcoral;
-}
-.corridor {
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-    padding: 15px 0;
-    background-color: #ccc;
-    border-radius: 8px;
-    font-weight: bold;
-}
-@media (max-width: 600px) {
-    .bed {
-        height: 35px;
-        font-size: 14px;
-    }
-    .room {
-        padding: 10px;
-        min-width: 100px;
-        max-width: 120px;
-    }
-    .corridor {
-        padding: 10px 0;
-        font-size: 14px;
-    }
-}
+body { font-family: Arial; background-color: #f5f5f5; margin:0; padding:0; }
+h1 { text-align:center; margin-top:20px; }
+.legend { text-align:center; margin-bottom:20px; }
+.legend span { display:inline-block; width:20px; height:20px; margin-right:5px; vertical-align:middle; border:1px solid #000; }
+.floor { display:flex; flex-direction:column; align-items:center; gap:30px; margin-bottom:50px; padding:0 10px; }
+.ward-row { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+.room { border:2px solid #555; padding:15px; background-color:#fff; border-radius:8px; display:flex; flex-direction:column; gap:10px; min-width:120px; flex:1 1 120px; max-width:150px; box-sizing:border-box; }
+.room-title { text-align:center; font-weight:bold; }
+.beds { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.bed { height:40px; border:2px solid #000; display:flex; align-items:center; justify-content:center; cursor:pointer; background-color:lightgreen; font-weight:bold; border-radius:5px; }
+.occupied { background-color:lightcoral; }
+.corridor { width:100%; max-width:800px; text-align:center; padding:15px 0; background-color:#ccc; border-radius:8px; font-weight:bold; }
+@media(max-width:600px){.bed{height:35px;font-size:14px}.room{padding:10px;min-width:100px;max-width:120px}.corridor{padding:10px 0;font-size:14px}}
 </style>
 </head>
 <body>
 
 <h1>Схема відділення</h1>
-
 <div class="legend">
     <span style="background-color: lightgreen;"></span> Вільно
     &nbsp;&nbsp;&nbsp;
@@ -113,8 +29,6 @@ h1 {
 </div>
 
 <div class="floor">
-
-  <!-- Верхній ряд палат -->
   <div class="ward-row">
     <div class="room" id="room1"></div>
     <div class="room" id="room2"></div>
@@ -122,10 +36,7 @@ h1 {
     <div class="room" id="room4"></div>
     <div class="room" id="room5"></div>
   </div>
-
   <div class="corridor">КОРИДОР</div>
-
-  <!-- Нижній ряд палат -->
   <div class="ward-row">
     <div class="room" id="room6"></div>
     <div class="room" id="room7"></div>
@@ -133,10 +44,9 @@ h1 {
     <div class="room" id="room9"></div>
     <div class="room" id="room10"></div>
   </div>
-
 </div>
 
-<!-- Firebase SDK (compat для старого синтаксису) -->
+<!-- Firebase SDK compat -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
@@ -156,33 +66,32 @@ const db = firebase.database();
 
 // Масив всіх ліжок
 const beds = [];
-for (let r = 1; r <= 10; r++) {
-    for (let b = 1; b <= 4; b++) {
-        beds.push(r + "-" + b);
+for(let r=1;r<=10;r++){
+    for(let b=1;b<=4;b++){
+        beds.push(r+"-"+b);
     }
 }
 
-// Створення кімнати
-function createRoom(roomNumber) {
-    let room = document.getElementById("room" + roomNumber);
-    let title = document.createElement("div");
-    title.className = "room-title";
-    title.innerText = "Палата " + roomNumber;
+// Створення кімнат
+function createRoom(roomNumber){
+    const room=document.getElementById("room"+roomNumber);
+    const title=document.createElement("div");
+    title.className="room-title";
+    title.innerText="Палата "+roomNumber;
     room.appendChild(title);
 
-    let bedsContainer = document.createElement("div");
-    bedsContainer.className = "beds";
+    const bedsContainer=document.createElement("div");
+    bedsContainer.className="beds";
 
-    for (let i = 1; i <= 4; i++) {
-        let bed = document.createElement("div");
-        bed.className = "bed";
-        bed.innerText = i;
-        bed.dataset.id = roomNumber + "-" + i;
+    for(let i=1;i<=4;i++){
+        const bed=document.createElement("div");
+        bed.className="bed";
+        bed.innerText=i;
+        bed.dataset.id=roomNumber+"-"+i;
 
-        // Зміна стану ліжка по кліку
-        bed.onclick = function() {
-            const bedRef = db.ref('beds/' + bed.dataset.id);
-            bedRef.transaction(current => current === 'occupied' ? 'free' : 'occupied');
+        bed.onclick=function(){
+            const bedRef=db.ref('beds/'+bed.dataset.id);
+            bedRef.transaction(current => current==='occupied'?'free':'occupied');
         };
 
         bedsContainer.appendChild(bed);
@@ -190,36 +99,34 @@ function createRoom(roomNumber) {
     room.appendChild(bedsContainer);
 }
 
-// Викликаємо створення кімнат після завантаження сторінки
-window.onload = function() {
-    for (let i = 1; i <= 10; i++) {
-        createRoom(i);
-    }
+// Головна функція після завантаження
+window.onload = function(){
 
-    // Ініціалізація бази, якщо порожня
-    db.ref('beds').once('value').then(snapshot => {
-        if (!snapshot.exists()) {
-            let initialData = {};
-            beds.forEach(bedId => {
-                initialData[bedId] = 'free';
-            });
+    // Перевірка бази і створення, якщо пусто
+    db.ref('beds').once('value').then(snapshot=>{
+        if(!snapshot.exists()){
+            const initialData={};
+            beds.forEach(bedId=>{initialData[bedId]='free';});
             return db.ref('beds').set(initialData);
         }
-    }).then(() => {
-        // Слухач змін у реальному часі
-        db.ref('beds').on('value', snapshot => {
-            const data = snapshot.val() || {};
-            document.querySelectorAll(".bed").forEach(bed => {
-                if (data[bed.dataset.id] === 'occupied') {
+    }).then(()=>{
+        // Створюємо кімнати
+        for(let i=1;i<=10;i++) createRoom(i);
+
+        // Підписка на зміни в реальному часі
+        db.ref('beds').on('value',snapshot=>{
+            const data=snapshot.val()||{};
+            document.querySelectorAll(".bed").forEach(bed=>{
+                if(data[bed.dataset.id]==='occupied'){
                     bed.classList.add("occupied");
-                } else {
+                }else{
                     bed.classList.remove("occupied");
                 }
             });
         });
     });
+
 };
 </script>
-
 </body>
 </html>
