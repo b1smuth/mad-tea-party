@@ -92,8 +92,17 @@ function createRoomDiv(blockIndex, roomNum){
     bed.dataset.id = bedId;
     beds.push(bedId);
 
-    bed.onclick = ()=>db.ref('beds/'+bedId).transaction(c=>c==='occupied'?'free':'occupied');
-    bedsDiv.appendChild(bed);
+    bed.onclick = () => {
+      const currentState = bed.classList.contains('occupied') ? 'Зайняте' : 'Вільно';
+      const newState = currentState === 'Вільно' ? 'Зайняте' : 'Вільно';
+
+      const confirmed = confirm(`Ви справді хочете змінити Ліжко №${b} в Палаті ${roomNum} на ${newState}?`);
+      if (confirmed) {
+        db.ref('beds/' + bedId).transaction(c => c === 'occupied' ? 'free' : 'occupied');
+      }
+    };
+    //bed.onclick = ()=>db.ref('beds/'+bedId).transaction(c=>c==='occupied'?'free':'occupied');
+    //bedsDiv.appendChild(bed);
   }
 
   room.appendChild(title);
@@ -120,3 +129,4 @@ db.ref('beds').on('value', snapshot=>{
 </script>
 </body>
 </html>
+
