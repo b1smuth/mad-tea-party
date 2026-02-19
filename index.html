@@ -37,7 +37,7 @@ h1 {
 .ward-row {
     display: flex;
     gap: 20px;
-    flex-wrap: wrap; /* Для адаптивності */
+    flex-wrap: wrap;
     justify-content: center;
 }
 .room {
@@ -49,7 +49,7 @@ h1 {
     flex-direction: column;
     gap: 10px;
     min-width: 120px;
-    flex: 1 1 120px; /* Адаптивна ширина */
+    flex: 1 1 120px;
     max-width: 150px;
     box-sizing: border-box;
 }
@@ -136,9 +136,9 @@ h1 {
 
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js"></script>
+<!-- Firebase SDK (compat для старого синтаксису) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -146,7 +146,7 @@ const firebaseConfig = {
     authDomain: "mad-tea-party-997ab.firebaseapp.com",
     databaseURL: "https://mad-tea-party-997ab-default-rtdb.europe-west1.firebasedatabase.app/",
     projectId: "mad-tea-party-997ab",
-    storageBucket: "mad-tea-party-997ab.firebasestorage.app",
+    storageBucket: "mad-tea-party-997ab.appspot.com",
     messagingSenderId: "607063415201",
     appId: "1:607063415201:web:b2f8b4e27cc861c6cb93e0"
 };
@@ -154,6 +154,7 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// Масив всіх ліжок
 const beds = [];
 for (let r = 1; r <= 10; r++) {
     for (let b = 1; b <= 4; b++) {
@@ -161,6 +162,7 @@ for (let r = 1; r <= 10; r++) {
     }
 }
 
+// Створення кімнати
 function createRoom(roomNumber) {
     let room = document.getElementById("room" + roomNumber);
     let title = document.createElement("div");
@@ -177,6 +179,7 @@ function createRoom(roomNumber) {
         bed.innerText = i;
         bed.dataset.id = roomNumber + "-" + i;
 
+        // Зміна стану ліжка по кліку
         bed.onclick = function() {
             const bedRef = db.ref('beds/' + bed.dataset.id);
             bedRef.transaction(current => current === 'occupied' ? 'free' : 'occupied');
@@ -187,32 +190,36 @@ function createRoom(roomNumber) {
     room.appendChild(bedsContainer);
 }
 
-for (let i = 1; i <= 10; i++) {
-    createRoom(i);
-}
-
-db.ref('beds').once('value').then(snapshot => {
-    if (!snapshot.exists()) {
-        let initialData = {};
-        beds.forEach(bedId => {
-            initialData[bedId] = 'free';
-        });
-        db.ref('beds').set(initialData);
+// Викликаємо створення кімнат після завантаження сторінки
+window.onload = function() {
+    for (let i = 1; i <= 10; i++) {
+        createRoom(i);
     }
-});
 
-db.ref('beds').on('value', snapshot => {
-    const data = snapshot.val() || {};
-    document.querySelectorAll(".bed").forEach(bed => {
-        if (data[bed.dataset.id] === 'occupied') {
-            bed.classList.add("occupied");
-        } else {
-            bed.classList.remove("occupied");
+    // Ініціалізація бази, якщо порожня
+    db.ref('beds').once('value').then(snapshot => {
+        if (!snapshot.exists()) {
+            let initialData = {};
+            beds.forEach(bedId => {
+                initialData[bedId] = 'free';
+            });
+            return db.ref('beds').set(initialData);
         }
+    }).then(() => {
+        // Слухач змін у реальному часі
+        db.ref('beds').on('value', snapshot => {
+            const data = snapshot.val() || {};
+            document.querySelectorAll(".bed").forEach(bed => {
+                if (data[bed.dataset.id] === 'occupied') {
+                    bed.classList.add("occupied");
+                } else {
+                    bed.classList.remove("occupied");
+                }
+            });
+        });
     });
-});
+};
 </script>
 
 </body>
 </html>
-
