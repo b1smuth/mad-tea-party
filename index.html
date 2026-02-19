@@ -17,7 +17,22 @@ h1 { text-align:center; margin:20px 0; color:#333; }
 .bed { height:35px; border:2px solid #999; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#a8d5ba; font-weight:bold; border-radius:4px; color:#333; transition:0.2s; }
 .occupied { background:#f5a38a; color:#333; }
 .corridor { width:100%; max-width:800px; text-align:center; padding:10px 0; background:#d1d3d4; border-radius:6px; font-weight:bold; margin:5px 0; color:#333; }
+
 @media(max-width:600px){.bed{height:30px;font-size:13px}.room{padding:8px;min-width:80px;max-width:100px}.corridor{font-size:13px;padding:8px 0}}
+
+/* Модальне вікно */
+#confirmModal {
+  position: fixed; top:0; left:0; width:100%; height:100%; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000;
+}
+#confirmModal .modal-content {
+  background:#fff; padding:20px 25px; border-radius:10px; text-align:center; max-width:300px; width:90%; box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+#confirmModal p { margin-bottom:20px; font-weight:bold; }
+#confirmModal button {
+  padding:8px 16px; margin:0 10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;
+}
+#confirmModal .ok-btn { background:#4CAF50; color:#fff; }
+#confirmModal .cancel-btn { background:#f44336; color:#fff; }
 </style>
 </head>
 <body>
@@ -30,6 +45,15 @@ h1 { text-align:center; margin:20px 0; color:#333; }
 </div>
 
 <div id="hospital"></div>
+
+<!-- Модальне вікно підтвердження -->
+<div id="confirmModal">
+  <div class="modal-content">
+    <p id="modalText">Текст підтвердження</p>
+    <button class="ok-btn">Так</button>
+    <button class="cancel-btn">Ні</button>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -51,6 +75,14 @@ const db = firebase.database();
 const corridors = ['Хірургія','Травма','Терапія','Невро'];
 const hospitalDiv = document.getElementById('hospital');
 const beds = [];
+
+// Модальне вікно елементи
+const modal = document.getElementById('confirmModal');
+const modalText = document.getElementById('modalText');
+const okBtn = modal.querySelector('.ok-btn');
+const cancelBtn = modal.querySelector('.cancel-btn');
+
+let currentBedId = null; // Ліжко, яке будемо змінювати
 
 // Створюємо кожен блок
 corridors.forEach((corrName, blockIndex)=>{
@@ -78,21 +110,30 @@ corridors.forEach((corrName, blockIndex)=>{
   hospitalDiv.appendChild(blockDiv);
 });
 
+// Створення палат з ліжками
 function createRoomDiv(blockIndex, roomNum){
-  const room=document.createElement('div'); room.className='room';
-  const title=document.createElement('div'); title.className='room-title';
+  const room = document.createElement('div'); room.className='room';
+  const title = document.createElement('div'); title.className='room-title';
   title.innerText='Палата '+roomNum;
-  const bedsDiv=document.createElement('div'); bedsDiv.className='beds';
+  const bedsDiv = document.createElement('div'); bedsDiv.className='beds';
 
-  for(let b=1;b<=4;b++){
-    const bed=document.createElement('div'); bed.className='bed';
-    bed.innerText=b;
+  for(let b=1; b<=4; b++){
+    const bed = document.createElement('div'); bed.className='bed';
+    bed.innerText = b;
 
-    const bedId=`b${blockIndex}-r${roomNum}-l${b}`;
+    const bedId = `b${blockIndex}-r${roomNum}-l${b}`;
     bed.dataset.id = bedId;
     beds.push(bedId);
 
-    bed.onclick = ()=>db.ref('beds/'+bedId).transaction(c=>c==='occupied'?'free':'occupied');
+    // Клік показує модальне вікно
+    bed.onclick = ()=>{
+      const currentState = bed.classList.contains('occupied') ? 'Зайняте' : 'Вільно';
+      const newState = currentState === 'Вільно' ? 'Зайняте' : 'Вільно';
+      currentBedId = bedId;
+      modalText.innerText = `Ви справді хочете змінити Ліжко №${b} в Палаті ${roomNum} на ${newState}?`;
+      modal.style.display = 'flex';
+    };
+
     bedsDiv.appendChild(bed);
   }
 
@@ -117,8 +158,16 @@ db.ref('beds').on('value', snapshot=>{
     b.classList.toggle('occupied', data[b.dataset.id]==='occupied');
   });
 });
+
+// Кнопки модального вікна
+okBtn.onclick = ()=>{
+  if(currentBedId) db.ref('beds/'+currentBedId).transaction(c=>c==='occupied'?'free':'occupied');
+  modal.style.display = 'none';
+};
+
+cancelBtn.onclick = ()=>{
+  modal.style.display = 'none';
+};
 </script>
 </body>
 </html>
-
-
