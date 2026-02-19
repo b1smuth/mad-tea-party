@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Схема відділення</title>
+<style>
+body {
+    font-family: Arial;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+.legend {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.legend span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+    border: 1px solid #000;
+}
+.floor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 50px;
+    padding: 0 10px;
+}
+.ward-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* Для адаптивності */
+    justify-content: center;
+}
+.room {
+    border: 2px solid #555;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 120px;
+    flex: 1 1 120px; /* Адаптивна ширина */
+    max-width: 150px;
+    box-sizing: border-box;
+}
+.room-title {
+    text-align: center;
+    font-weight: bold;
+}
+.beds {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.bed {
+    height: 40px;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: lightgreen;
+    font-weight: bold;
+    border-radius: 5px;
+}
+.occupied {
+    background-color: lightcoral;
+}
+.corridor {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    padding: 15px 0;
+    background-color: #ccc;
+    border-radius: 8px;
+    font-weight: bold;
+}
+@media (max-width: 600px) {
+    .bed {
+        height: 35px;
+        font-size: 14px;
+    }
+    .room {
+        padding: 10px;
+        min-width: 100px;
+        max-width: 120px;
+    }
+    .corridor {
+        padding: 10px 0;
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+<body>
+
+<h1>Схема відділення</h1>
+
+<div class="legend">
+    <span style="background-color: lightgreen;"></span> Вільно
+    &nbsp;&nbsp;&nbsp;
+    <span style="background-color: lightcoral;"></span> Зайнято
+</div>
+
+<div class="floor">
+
+  <!-- Верхній ряд палат -->
+  <div class="ward-row">
+    <div class="room" id="room1"></div>
+    <div class="room" id="room2"></div>
+    <div class="room" id="room3"></div>
+    <div class="room" id="room4"></div>
+    <div class="room" id="room5"></div>
+  </div>
+
+  <div class="corridor">КОРИДОР</div>
+
+  <!-- Нижній ряд палат -->
+  <div class="ward-row">
+    <div class="room" id="room6"></div>
+    <div class="room" id="room7"></div>
+    <div class="room" id="room8"></div>
+    <div class="room" id="room9"></div>
+    <div class="room" id="room10"></div>
+  </div>
+
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "ТУТ_ТВОЙ_API_KEY",
+    authDomain: "ТУТ_ТВОЙ_PROJECT.firebaseapp.com",
+    databaseURL: "https://ТУТ_ТВОЙ_PROJECT.firebaseio.com",
+    projectId: "ТУТ_ТВОЙ_PROJECT",
+    storageBucket: "ТУТ_ТВОЙ_PROJECT.appspot.com",
+    messagingSenderId: "ТУТ_ТВОЙ_ID",
+    appId: "ТУТ_ТВОЙ_APP_ID"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const beds = [];
+for (let r = 1; r <= 10; r++) {
+    for (let b = 1; b <= 4; b++) {
+        beds.push(r + "-" + b);
+    }
+}
+
+function createRoom(roomNumber) {
+    let room = document.getElementById("room" + roomNumber);
+    let title = document.createElement("div");
+    title.className = "room-title";
+    title.innerText = "Палата " + roomNumber;
+    room.appendChild(title);
+
+    let bedsContainer = document.createElement("div");
+    bedsContainer.className = "beds";
+
+    for (let i = 1; i <= 4; i++) {
+        let bed = document.createElement("div");
+        bed.className = "bed";
+        bed.innerText = i;
+        bed.dataset.id = roomNumber + "-" + i;
+
+        bed.onclick = function() {
+            const bedRef = db.ref('beds/' + bed.dataset.id);
+            bedRef.transaction(current => current === 'occupied' ? 'free' : 'occupied');
+        };
+
+        bedsContainer.appendChild(bed);
+    }
+    room.appendChild(bedsContainer);
+}
+
+for (let i = 1; i <= 10; i++) {
+    createRoom(i);
+}
+
+db.ref('beds').once('value').then(snapshot => {
+    if (!snapshot.exists()) {
+        let initialData = {};
+        beds.forEach(bedId => {
+            initialData[bedId] = 'free';
+        });
+        db.ref('beds').set(initialData);
+    }
+});
+
+db.ref('beds').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    document.querySelectorAll(".bed").forEach(bed => {
+        if (data[bed.dataset.id] === 'occupied') {
+            bed.classList.add("occupied");
+        } else {
+            bed.classList.remove("occupied");
+        }
+    });
+});
+</script>
+
+</body>
+</html>
