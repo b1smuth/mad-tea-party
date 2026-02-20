@@ -132,9 +132,13 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
 });
 
 // 🔥 Повна перезапис структури в Firebase
-const initialData = {};
-bedsList.forEach(id=>initialData[id]='free');
-db.ref('beds').set(initialData);
+db.ref('beds').once('value').then(snapshot=>{
+  if(!snapshot.exists()){
+    const initial={};
+    beds.forEach(b=>initial[b]='free');
+    db.ref('beds').set(initial);
+  }
+});
 
 // Підписка
 db.ref('beds').on('value', snapshot=>{
@@ -154,5 +158,6 @@ cancelBtn.onclick=()=> modal.style.display='none';
 </script>
 </body>
 </html>
+
 
 
