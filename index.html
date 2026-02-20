@@ -121,8 +121,8 @@ h1 {
 /* Ліжка */
 .beds {
   display: grid;
-  grid-auto-flow: column;           /* заповнення по колонках */
-  grid-template-rows: repeat(5, 42px); /* максимум 5 ліжок у стовпчику */
+  grid-auto-flow: line;           /* заповнення по колонках */
+  /*grid-template-rows: repeat(5, 42px);*/ /* максимум 5 ліжок у стовпчику */
   gap: 10px;
   justify-content: center;
 }
@@ -341,6 +341,7 @@ cancelBtn.onclick=()=> modal.style.display='none';
 
 </body>
 </html>
+
 
 
 
