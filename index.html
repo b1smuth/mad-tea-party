@@ -53,8 +53,6 @@ h1 {
   text-align:center;
 }
 
-.state-free { color: #a8d5ba; font-weight: bold; }
-.state-occupied { color: #f5a38a; font-weight: bold; }
 #occupiedCount { color:#e74c3c; }
 #freeCount { color:#27ae60; }
 
@@ -252,8 +250,7 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
       const isOccupied = bed.classList.contains('occupied');
       const newState = isOccupied ? 'Вільно' : 'Зайняте';
       currentBedId = bedId;
-      //modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;
-      modalText.innerHTML = `Змінити Ліжко №${i} в Палаті ${roomNum} на <span class="${stateClass}">${newState}</span>?`;
+      modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;
       modal.style.display='flex';
     };
 
@@ -299,6 +296,7 @@ cancelBtn.onclick=()=> modal.style.display='none';
 </script>
 </body>
 </html>
+
 
 
 
