@@ -4,56 +4,167 @@
 <meta charset="UTF-8">
 <title>Хірургія</title>
 <style>
-body { font-family: Arial, sans-serif; background:#f0f4f8; margin:0; padding:0; color:#333; }
-h1 { text-align:center; margin:20px 0; color:#333; }
+body {
+  font-family: Arial, sans-serif;
+  background:#f0f4f8;
+  margin:0;
+  padding:0;
+  color:#333;
+}
 
-.legend, .stats { text-align:center; margin-bottom:15px; font-weight:bold; }
+h1 {
+  text-align:center;
+  margin:20px 0;
+}
 
-.legend span { display:inline-block; width:20px; height:20px; margin-right:5px; border:1px solid #333; vertical-align:middle; }
+.legend {
+  text-align:center;
+  margin-bottom:10px;
+  font-weight:bold;
+}
 
+.legend span {
+  display:inline-block;
+  width:20px;
+  height:20px;
+  margin-right:5px;
+  border:1px solid #333;
+  vertical-align:middle;
+  border-radius:4px;
+}
+
+/* 🔢 Статистика */
 .stats {
   display:flex;
   justify-content:center;
   gap:25px;
   flex-wrap:wrap;
-  font-size:16px;
+  margin-bottom:20px;
 }
 
 .stat-box {
   background:#ffffff;
-  padding:8px 15px;
-  border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  padding:10px 18px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  font-weight:bold;
+  font-size:15px;
+  min-width:150px;
+  text-align:center;
 }
 
-.hospital-block { border:2px solid #ccc; border-radius:8px; padding:15px; margin:20px auto; background:#e8e6e3; max-width:1000px; }
-.ward-row { display:flex; gap:15px; flex-wrap:wrap; justify-content:center; }
+#occupiedCount { color:#e74c3c; }
+#freeCount { color:#27ae60; }
 
-.room { border:2px solid #b0b0b0; padding:10px; background:#fff; border-radius:6px; display:flex; flex-direction:column; gap:5px; min-width:110px; }
-.room-title { text-align:center; font-weight:bold; }
+.hospital-block {
+  border:2px solid #ccc;
+  border-radius:12px;
+  padding:20px;
+  margin:20px auto;
+  background:#e8e6e3;
+  max-width:1100px;
+}
 
-.beds { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+.ward-row {
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
 
-.bed { height:35px; border:2px solid #999; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#a8d5ba; font-weight:bold; border-radius:4px; transition:0.2s; }
-.occupied { background:#f5a38a; }
+.room {
+  border:2px solid #d0d0d0;
+  padding:15px;
+  background:#fff;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  min-width:130px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.05);
+}
 
-@media(max-width:600px){.bed{height:30px;font-size:13px}.room{min-width:90px}}
+.room-title {
+  font-weight:bold;
+  font-size:15px;
+}
+
+/* 🔥 ГОЛОВНЕ — гарне центрування */
+.beds {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, 40px);
+  justify-content:center;
+  gap:8px;
+  width:100%;
+}
+
+.bed {
+  height:40px;
+  width:40px;
+  border:2px solid #999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  background:#a8d5ba;
+  font-weight:bold;
+  border-radius:8px;
+  transition:0.2s;
+}
+
+.bed:hover {
+  transform:scale(1.08);
+}
+
+.occupied {
+  background:#f5a38a;
+}
+
+@media(max-width:600px){
+  .bed{height:35px;width:35px;font-size:13px}
+}
 
 /* Модальне */
 #confirmModal {
-  position: fixed; top:0; left:0; width:100%; height:100%; display:none;
-  align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000;
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,0.5);
+  z-index:1000;
 }
+
 #confirmModal .modal-content {
-  background:#fff; padding:20px 25px; border-radius:10px; text-align:center;
-  max-width:300px; width:90%; box-shadow:0 4px 15px rgba(0,0,0,0.2);
+  background:#fff;
+  padding:25px;
+  border-radius:15px;
+  text-align:center;
+  max-width:320px;
+  width:90%;
+  box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
-#confirmModal p { margin-bottom:20px; font-weight:bold; }
+
+#confirmModal p {
+  margin-bottom:20px;
+  font-weight:bold;
+}
+
 #confirmModal button {
-  padding:8px 16px; margin:0 10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;
+  padding:8px 18px;
+  margin:0 10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
 }
-#confirmModal .ok-btn { background:#a8d5ba; }
-#confirmModal .cancel-btn { background:#f5a38a; }
+
+.ok-btn { background:#27ae60; color:white; }
+.cancel-btn { background:#e74c3c; color:white; }
 </style>
 </head>
 <body>
@@ -65,11 +176,10 @@ h1 { text-align:center; margin:20px 0; color:#333; }
   <span style="background:#f5a38a;"></span> Зайнято
 </div>
 
-<!-- 🔢 Лічильник -->
 <div class="stats">
-  <div class="stat-box">Всього місць: <span id="totalCount">0</span></div>
-  <div class="stat-box">Зайнятих: <span id="occupiedCount">0</span></div>
-  <div class="stat-box">Вільних: <span id="freeCount">0</span></div>
+  <div class="stat-box">Всього місць<br><span id="totalCount">0</span></div>
+  <div class="stat-box">Зайнятих<br><span id="occupiedCount">0</span></div>
+  <div class="stat-box">Вільних<br><span id="freeCount">0</span></div>
 </div>
 
 <div class="hospital-block">
@@ -152,12 +262,10 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   wardsDiv.appendChild(room);
 });
 
-// 🔥 Перезапис структури
 const initialData = {};
 bedsList.forEach(id=>initialData[id]='free');
 db.ref('beds').set(initialData);
 
-// 🔄 Підписка + оновлення статистики
 db.ref('beds').on('value', snapshot=>{
   const data=snapshot.val()||{};
   let total=0, occupied=0;
