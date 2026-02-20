@@ -85,11 +85,10 @@ h1 {
   box-shadow:0 10px 30px rgba(13,110,253,0.08);
 }
 
-/* 🔥 ГОЛОВНА ЗМІНА */
+/* Головна зміна: палатами по ширині контейнера */
 .ward-row {
-  display:grid;
-  grid-auto-flow: column;              /* заповнення по колонках */
-  grid-template-rows: repeat(5, auto); /* максимум 5 палат у колонці */
+  display:flex;
+  flex-wrap:wrap;
   gap:25px;
   justify-content:center;
 }
@@ -121,10 +120,11 @@ h1 {
 
 /* Ліжка */
 .beds {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, 42px);
-  justify-content:center;
-  gap:10px;
+  display: grid;
+  grid-auto-flow: column;           /* заповнення по колонках */
+  grid-template-rows: repeat(5, 42px); /* максимум 5 ліжок у стовпчику */
+  gap: 10px;
+  justify-content: center;
 }
 
 .bed {
@@ -153,10 +153,10 @@ h1 {
 }
 
 @media(max-width:900px){
-  .ward-row {
-    grid-auto-flow: row;   /* на мобілці знову рядками */
+  .beds {
+    grid-auto-flow: row;
     grid-template-rows: none;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
   }
 }
 
@@ -266,6 +266,7 @@ const cancelBtn = modal.querySelector('.cancel-btn');
 
 let currentBedId = null;
 
+// Створення палат і ліжок
 Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   const room = document.createElement('div');
   room.className='room';
@@ -302,6 +303,7 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   wardsDiv.appendChild(room);
 });
 
+// Ініціалізація Firebase, якщо бази ще нема
 db.ref('beds').once('value', snapshot => {
   if (!snapshot.exists()) {
     const initialData = {};
@@ -310,6 +312,7 @@ db.ref('beds').once('value', snapshot => {
   }
 });
 
+// Відображення стану ліжок
 db.ref('beds').on('value', snapshot=>{
   const data=snapshot.val()||{};
   let total=0, occupied=0;
@@ -326,6 +329,7 @@ db.ref('beds').on('value', snapshot=>{
   document.getElementById('freeCount').innerText = total - occupied;
 });
 
+// Зміна стану ліжка через модалку
 okBtn.onclick=()=>{
   if(currentBedId)
     db.ref('beds/'+currentBedId).transaction(c=>c==='occupied'?'free':'occupied');
@@ -337,6 +341,7 @@ cancelBtn.onclick=()=> modal.style.display='none';
 
 </body>
 </html>
+
 
 
 
