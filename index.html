@@ -2,143 +2,114 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Хірургічне відділення</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
+<title>Хірургія</title>
 <style>
 body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg,#eaf4ff,#f7fbff);
+  font-family: Arial, sans-serif;
+  background:#f0f4f8;
   margin:0;
   padding:0;
-  color:#1f2d3d;
+  color:#333;
 }
 
 h1 {
   text-align:center;
-  margin:25px 0 10px;
-  font-weight:700;
-  color:#0b5ed7;
+  margin:20px 0;
 }
 
-.subtitle {
-  text-align:center;
-  margin-bottom:20px;
-  color:#6c757d;
-  font-size:14px;
-}
-
-/* Легенда */
 .legend {
   text-align:center;
-  margin-bottom:15px;
-  font-weight:600;
+  margin-bottom:10px;
+  font-weight:bold;
 }
 
 .legend span {
   display:inline-block;
-  width:18px;
-  height:18px;
-  margin-right:6px;
-  border-radius:4px;
+  width:20px;
+  height:20px;
+  margin-right:5px;
+  border:1px solid #333;
   vertical-align:middle;
+  border-radius:4px;
 }
 
-/* Статистика */
+/* 🔢 Статистика */
 .stats {
   display:flex;
   justify-content:center;
-  gap:20px;
+  gap:25px;
   flex-wrap:wrap;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 
 .stat-box {
   background:#ffffff;
-  padding:14px 20px;
-  border-radius:14px;
-  box-shadow:0 6px 20px rgba(13,110,253,0.08);
+  padding:10px 18px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  font-weight:bold;
+  font-size:15px;
+  min-width:150px;
   text-align:center;
-  min-width:160px;
-  border:1px solid #e3f0ff;
 }
 
-.stat-box span {
-  display:block;
-  font-size:24px;
-  font-weight:700;
-  margin-top:5px;
-}
+#occupiedCount { color:#e74c3c; }
+#freeCount { color:#27ae60; }
 
-#occupiedCount { color:#dc3545; }
-#freeCount { color:#198754; }
-#totalCount { color:#0d6efd; }
-
-/* Блок палат */
 .hospital-block {
-  border-radius:18px;
-  padding:25px;
-  margin:20px auto 40px;
-  background:#ffffff;
-  max-width:1150px;
-  box-shadow:0 10px 30px rgba(13,110,253,0.08);
+  border:2px solid #ccc;
+  border-radius:12px;
+  padding:20px;
+  margin:20px auto;
+  background:#e8e6e3;
+  max-width:1100px;
 }
 
-/* Головна зміна: палатами по ширині контейнера */
 .ward-row {
   display:flex;
+  gap:20px;
   flex-wrap:wrap;
-  gap:25px;
   justify-content:center;
 }
 
-/* Палата */
 .room {
-  background:#f8fbff;
-  border:1px solid #dbeafe;
-  border-radius:16px;
-  padding:18px;
+  border:2px solid #d0d0d0;
+  padding:15px;
+  background:#fff;
+  border-radius:12px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:12px;
-  min-width:160px;
-  transition:0.2s;
-}
-
-.room:hover {
-  transform:translateY(-3px);
-  box-shadow:0 8px 20px rgba(13,110,253,0.12);
+  gap:10px;
+  min-width:130px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.05);
 }
 
 .room-title {
-  font-weight:600;
-  color:#0d6efd;
+  font-weight:bold;
   font-size:15px;
 }
 
-/* Ліжка */
+/* 🔥 ГОЛОВНЕ — гарне центрування */
 .beds {
-  display: grid;
-  grid-auto-flow: column;           /* заповнення по колонках */
-  grid-template-rows: repeat(5, 42px); /* максимум 5 ліжок у стовпчику */
-  gap: 10px;
-  justify-content: center;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, 40px);
+  justify-content:center;
+  gap:8px;
+  width:100%;
 }
 
 .bed {
-  height:42px;
-  width:42px;
-  border-radius:10px;
+  height:40px;
+  width:40px;
+  border:2px solid #999;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  font-weight:600;
-  border:2px solid #b6d4fe;
-  background:#d1e7dd;
-  color:#155724;
+  background:#a8d5ba;
+  font-weight:bold;
+  border-radius:8px;
   transition:0.2s;
 }
 
@@ -147,79 +118,68 @@ h1 {
 }
 
 .occupied {
-  background:#f8d7da;
-  border-color:#f1aeb5;
-  color:#842029;
-}
-
-@media(max-width:900px){
-  .beds {
-    grid-auto-flow: row;
-    grid-template-rows: none;
-    grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
-  }
+  background:#f5a38a;
 }
 
 @media(max-width:600px){
-  .bed{height:36px;width:36px;font-size:13px}
+  .bed{height:35px;width:35px;font-size:13px}
 }
 
 /* Модальне */
 #confirmModal {
   position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   display:none;
   align-items:center;
   justify-content:center;
-  background: rgba(13,110,253,0.2);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.5);
+  z-index:1000;
 }
 
 #confirmModal .modal-content {
-  background:#ffffff;
-  padding:28px;
-  border-radius:18px;
+  background:#fff;
+  padding:25px;
+  border-radius:15px;
   text-align:center;
   max-width:320px;
   width:90%;
-  box-shadow:0 10px 30px rgba(13,110,253,0.2);
+  box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
 
 #confirmModal p {
-  margin-bottom:22px;
-  font-weight:600;
+  margin-bottom:20px;
+  font-weight:bold;
 }
 
 #confirmModal button {
-  padding:9px 20px;
+  padding:8px 18px;
   margin:0 10px;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   cursor:pointer;
-  font-weight:600;
+  font-weight:bold;
 }
 
-.ok-btn { background:#198754; color:white; }
-.cancel-btn { background:#dc3545; color:white; }
+.ok-btn { background:#27ae60; color:white; }
+.cancel-btn { background:#e74c3c; color:white; }
 </style>
 </head>
-
 <body>
 
-<h1>🏥 Хірургічне відділення</h1>
-<div class="subtitle">Моніторинг зайнятості ліжок у реальному часі</div>
+<h1>Хірургія</h1>
 
 <div class="legend">
-  <span style="background:#d1e7dd;"></span> Вільно
-  &nbsp;&nbsp;&nbsp;
-  <span style="background:#f8d7da;"></span> Зайнято
+  <span style="background:#a8d5ba;"></span> Вільно &nbsp;&nbsp;&nbsp;
+  <span style="background:#f5a38a;"></span> Зайнято
 </div>
 
 <div class="stats">
-  <div class="stat-box">Всього місць <span id="totalCount">0</span></div>
-  <div class="stat-box">Зайнятих <span id="occupiedCount">0</span></div>
-  <div class="stat-box">Вільних <span id="freeCount">0</span></div>
+  <div class="stat-box">Всього місць<br><span id="totalCount">0</span></div>
+  <div class="stat-box">Зайнятих<br><span id="occupiedCount">0</span></div>
+  <div class="stat-box">Вільних<br><span id="freeCount">0</span></div>
 </div>
 
 <div class="hospital-block">
@@ -266,7 +226,6 @@ const cancelBtn = modal.querySelector('.cancel-btn');
 
 let currentBedId = null;
 
-// Створення палат і ліжок
 Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   const room = document.createElement('div');
   room.className='room';
@@ -291,7 +250,7 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
       const isOccupied = bed.classList.contains('occupied');
       const newState = isOccupied ? 'Вільно' : 'Зайняте';
       currentBedId = bedId;
-      modalText.innerText = `Змінити ліжко №${i} в палаті ${roomNum} на ${newState}?`;
+      modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;
       modal.style.display='flex';
     };
 
@@ -303,7 +262,6 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   wardsDiv.appendChild(room);
 });
 
-// Ініціалізація Firebase, якщо бази ще нема
 db.ref('beds').once('value', snapshot => {
   if (!snapshot.exists()) {
     const initialData = {};
@@ -312,7 +270,6 @@ db.ref('beds').once('value', snapshot => {
   }
 });
 
-// Відображення стану ліжок
 db.ref('beds').on('value', snapshot=>{
   const data=snapshot.val()||{};
   let total=0, occupied=0;
@@ -329,7 +286,6 @@ db.ref('beds').on('value', snapshot=>{
   document.getElementById('freeCount').innerText = total - occupied;
 });
 
-// Зміна стану ліжка через модалку
 okBtn.onclick=()=>{
   if(currentBedId)
     db.ref('beds/'+currentBedId).transaction(c=>c==='occupied'?'free':'occupied');
@@ -338,9 +294,9 @@ okBtn.onclick=()=>{
 
 cancelBtn.onclick=()=> modal.style.display='none';
 </script>
-
 </body>
 </html>
+
 
 
 
