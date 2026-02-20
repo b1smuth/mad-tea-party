@@ -12,17 +12,13 @@ body {
   color:#333;
 }
 
-h1 {
-  text-align:center;
-  margin:20px 0;
-}
+h1 { text-align:center; margin:20px 0; }
 
 .legend {
   text-align:center;
   margin-bottom:10px;
   font-weight:bold;
 }
-
 .legend span {
   display:inline-block;
   width:20px;
@@ -41,7 +37,6 @@ h1 {
   flex-wrap:wrap;
   margin-bottom:20px;
 }
-
 .stat-box {
   background:#ffffff;
   padding:10px 18px;
@@ -52,7 +47,6 @@ h1 {
   min-width:150px;
   text-align:center;
 }
-
 #occupiedCount { color:#e74c3c; }
 #freeCount { color:#27ae60; }
 
@@ -84,13 +78,9 @@ h1 {
   min-width:130px;
   box-shadow:0 3px 8px rgba(0,0,0,0.05);
 }
+.room-title { font-weight:bold; font-size:15px; }
 
-.room-title {
-  font-weight:bold;
-  font-size:15px;
-}
-
-/* 🔥 ГОЛОВНЕ — гарне центрування */
+/* 🔥 Ліжка */
 .beds {
   display:grid;
   grid-template-columns: repeat(auto-fit, 40px);
@@ -98,7 +88,6 @@ h1 {
   gap:8px;
   width:100%;
 }
-
 .bed {
   height:40px;
   width:40px;
@@ -112,20 +101,11 @@ h1 {
   border-radius:8px;
   transition:0.2s;
 }
+.bed:hover { transform:scale(1.08); }
+.occupied { background:#f5a38a; }
+@media(max-width:600px){ .bed{height:35px;width:35px;font-size:13px} }
 
-.bed:hover {
-  transform:scale(1.08);
-}
-
-.occupied {
-  background:#f5a38a;
-}
-
-@media(max-width:600px){
-  .bed{height:35px;width:35px;font-size:13px}
-}
-
-/* Модальне */
+/* 🔥 Модальне */
 #confirmModal {
   position: fixed;
   top:0;
@@ -138,7 +118,6 @@ h1 {
   background: rgba(0,0,0,0.5);
   z-index:1000;
 }
-
 #confirmModal .modal-content {
   background:#fff;
   padding:25px;
@@ -148,10 +127,27 @@ h1 {
   width:90%;
   box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
-
 #confirmModal p {
   margin-bottom:20px;
   font-weight:bold;
+}
+
+/* Слова Вільно/Зайнято як кнопки */
+.state-free {
+  background:#a8d5ba;
+  color:#333;
+  padding:3px 8px;
+  border-radius:6px;
+  font-weight:bold;
+  display:inline-block;
+}
+.state-occupied {
+  background:#f5a38a;
+  color:#333;
+  padding:3px 8px;
+  border-radius:6px;
+  font-weight:bold;
+  display:inline-block;
 }
 
 #confirmModal button {
@@ -162,7 +158,6 @@ h1 {
   cursor:pointer;
   font-weight:bold;
 }
-
 .ok-btn { background:#a8d5ba; color:#333; }
 .cancel-btn { background:#f5a38a; color:#333; }
 </style>
@@ -248,9 +243,13 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
 
     bed.onclick=()=>{
       const isOccupied = bed.classList.contains('occupied');
-      const newState = isOccupied ? 'Вільно' : 'Зайняте';
+      const newState = isOccupied ? 'Вільно' : 'Зайнято';
       currentBedId = bedId;
-      modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;
+
+      // 🔥 тут додаємо стиль як кнопку
+      const stateClass = newState==='Вільно' ? 'state-free' : 'state-occupied';
+      modalText.innerHTML = `Змінити Ліжко №${i} в Палаті ${roomNum} на <span class="${stateClass}">${newState}</span>?`;
+
       modal.style.display='flex';
     };
 
@@ -296,6 +295,7 @@ cancelBtn.onclick=()=> modal.style.display='none';
 </script>
 </body>
 </html>
+
 
 
 
