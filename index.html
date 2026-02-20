@@ -250,7 +250,8 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
       const isOccupied = bed.classList.contains('occupied');
       const newState = isOccupied ? 'Вільно' : 'Зайняте';
       currentBedId = bedId;
-      modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;
+      /*modalText.innerText = `Змінити Ліжко №${i} в Палаті ${roomNum} на ${newState}?`;*/
+      modalText.innerHTML = `Змінити Ліжко №${i} в Палаті ${roomNum} на <span style="color:${color}; font-weight:bold;">${newState}</span>?`;
       modal.style.display='flex';
     };
 
@@ -296,6 +297,7 @@ cancelBtn.onclick=()=> modal.style.display='none';
 </script>
 </body>
 </html>
+
 
 
 
