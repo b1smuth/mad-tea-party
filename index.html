@@ -246,8 +246,13 @@ const firebaseConfig = {
   appId: "1:607063415201:web:b2f8b4e27cc861c6cb93e0"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+db.ref('beds').once('value', snapshot => {
+  if (!snapshot.exists()) {
+    const initialData = {};
+    bedsList.forEach(id => initialData[id] = 'free');
+    db.ref('beds').set(initialData);
+  }
+});
 
 const wardStructure = {
   1:5, 2:3, 3:5, 4:3, 5:3,
@@ -331,3 +336,4 @@ cancelBtn.onclick=()=> modal.style.display='none';
 
 </body>
 </html>
+
