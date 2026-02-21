@@ -268,14 +268,24 @@ db.ref('beds').on('value', snap=>{
 okBtn.onclick=()=>{
   if(!currentBedId) return;
 
-  if(currentState==='reanimation'){
+  /*if(currentState==='reanimation'){
     modal.style.display='none';
     return;
   }
 
   db.ref('beds/'+currentBedId).set(
     currentState==='occupied'?'free':'occupied'
-  );
+  );*/
+  if(currentState==='reanimation'){
+  // 🔴 З реанімації → стає ВІЛЬНИМ
+    db.ref('beds/'+currentBedId).set('free');
+  }
+  else if(currentState==='occupied'){
+    db.ref('beds/'+currentBedId).set('free');
+  }
+  else{
+    db.ref('beds/'+currentBedId).set('occupied');
+  }
 
   modal.style.display='none';
 };
@@ -311,6 +321,7 @@ reaBtn.onclick=()=>{
 </script>
 </body>
 </html>
+
 
 
 
