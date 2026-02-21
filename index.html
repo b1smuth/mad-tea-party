@@ -221,7 +221,7 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
       currentState=bed.classList.contains('reanimation')?'reanimation':
                    bed.classList.contains('occupied')?'occupied':'free';
 
-      modalText.innerText=`Змінити стан ліжка №${i}?`;
+      modalText.innerText=`Змінити стан ліжка №${i} в Палаті ${roomNum}?`;
 
       if(currentState==='reanimation'){
         reaBtn.innerText='З реанімації';
@@ -311,6 +311,7 @@ reaBtn.onclick=()=>{
 </script>
 </body>
 </html>
+
 
 
 
