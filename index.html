@@ -29,7 +29,6 @@ h1 { text-align:center; margin:20px 0; }
   border-radius:4px;
 }
 
-/* 🔢 Статистика */
 .stats {
   display:flex;
   justify-content:center;
@@ -47,8 +46,10 @@ h1 { text-align:center; margin:20px 0; }
   min-width:150px;
   text-align:center;
 }
+
 #occupiedCount { color:#e74c3c; }
 #freeCount { color:#27ae60; }
+#reanimationCount { color:#3498db; }
 
 .hospital-block {
   border:2px solid #ccc;
@@ -78,9 +79,9 @@ h1 { text-align:center; margin:20px 0; }
   min-width:130px;
   box-shadow:0 3px 8px rgba(0,0,0,0.05);
 }
+
 .room-title { font-weight:bold; font-size:15px; }
 
-/* 🔥 Ліжка */
 .beds {
   display:grid;
   grid-template-columns: repeat(auto-fit, 40px);
@@ -88,6 +89,7 @@ h1 { text-align:center; margin:20px 0; }
   gap:8px;
   width:100%;
 }
+
 .bed {
   height:40px;
   width:40px;
@@ -101,23 +103,21 @@ h1 { text-align:center; margin:20px 0; }
   border-radius:8px;
   transition:0.2s;
 }
-.bed:hover { transform:scale(1.08); }
-.occupied { background:#f5a38a; }
-@media(max-width:600px){ .bed{height:35px;width:35px;font-size:13px} }
 
-/* 🔥 Модальне */
+.occupied { background:#f5a38a; }
+.reanimation { background:#3498db; color:white; }
+
 #confirmModal {
   position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  top:0; left:0;
+  width:100%; height:100%;
   display:none;
   align-items:center;
   justify-content:center;
   background: rgba(0,0,0,0.5);
   z-index:1000;
 }
+
 #confirmModal .modal-content {
   background:#fff;
   padding:25px;
@@ -125,41 +125,26 @@ h1 { text-align:center; margin:20px 0; }
   text-align:center;
   max-width:320px;
   width:90%;
-  box-shadow:0 5px 20px rgba(0,0,0,0.2);
-}
-#confirmModal p {
-  margin-bottom:20px;
-  font-weight:bold;
-}
-
-/* Слова Вільно/Зайнято як кнопки */
-.state-free {
-  background:#a8d5ba;
-  color:#333;
-  padding:3px 8px;
-  border-radius:6px;
-  font-weight:bold;
-  display:inline-block;
-}
-.state-occupied {
-  background:#f5a38a;
-  color:#333;
-  padding:3px 8px;
-  border-radius:6px;
-  font-weight:bold;
-  display:inline-block;
 }
 
 #confirmModal button {
-  padding:8px 18px;
-  margin:0 10px;
+  padding:8px 15px;
+  margin:5px;
   border:none;
   border-radius:8px;
   cursor:pointer;
   font-weight:bold;
 }
-.ok-btn { background:#a8d5ba; color:#333; }
-.cancel-btn { background:#f5a38a; color:#333; }
+
+.ok-btn { background:#a8d5ba; }
+.cancel-btn { background:#f5a38a; }
+.rea-btn { background:#3498db; color:white; }
+
+.rea-btn:disabled {
+  background:#ccc;
+  color:#666;
+  cursor:not-allowed;
+}
 </style>
 </head>
 <body>
@@ -167,14 +152,16 @@ h1 { text-align:center; margin:20px 0; }
 <h1>Хірургія</h1>
 
 <div class="legend">
-  <span style="background:#a8d5ba;"></span> Вільно &nbsp;&nbsp;&nbsp;
-  <span style="background:#f5a38a;"></span> Зайнято
+  <span style="background:#a8d5ba;"></span> Вільно
+  <span style="background:#f5a38a; margin-left:15px;"></span> Зайнято
+  <span style="background:#3498db; margin-left:15px;"></span> Реанімація
 </div>
 
 <div class="stats">
-  <div class="stat-box">Всього місць<br><span id="totalCount">0</span></div>
+  <div class="stat-box">Всього<br><span id="totalCount">0</span></div>
   <div class="stat-box">Зайнятих<br><span id="occupiedCount">0</span></div>
   <div class="stat-box">Вільних<br><span id="freeCount">0</span></div>
+  <div class="stat-box">В реанімації<br><span id="reanimationCount">0</span></div>
 </div>
 
 <div class="hospital-block">
@@ -186,6 +173,7 @@ h1 { text-align:center; margin:20px 0; }
     <p id="modalText"></p>
     <button class="ok-btn">Так</button>
     <button class="cancel-btn">Ні</button>
+    <button class="rea-btn">До реанімації</button>
   </div>
 </div>
 
@@ -193,62 +181,60 @@ h1 { text-align:center; margin:20px 0; }
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCiLZaoin-oSJ6IFGefSkctV4WW4YcnKlE",
+firebase.initializeApp({
+  apiKey: "AIza...",
   authDomain: "mad-tea-party-997ab.firebaseapp.com",
   databaseURL: "https://mad-tea-party-997ab-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "mad-tea-party-997ab",
-  storageBucket: "mad-tea-party-997ab.appspot.com",
-  messagingSenderId: "607063415201",
-  appId: "1:607063415201:web:b2f8b4e27cc861c6cb93e0"
-};
+  projectId: "mad-tea-party-997ab"
+});
 
-firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const MAX_REA = 6;
 
-const wardStructure = {
-  1:5, 2:3, 3:5, 4:3, 5:3,
-  8:2, 9:8, 10:5, 11:3
-};
-
+const wardStructure = {1:5,2:3,3:5,4:3,5:3,8:2,9:8,10:5,11:3};
 const wardsDiv = document.getElementById('wards');
-const bedsList = [];
-
 const modal = document.getElementById('confirmModal');
 const modalText = document.getElementById('modalText');
-const okBtn = modal.querySelector('.ok-btn');
-const cancelBtn = modal.querySelector('.cancel-btn');
+const okBtn = document.querySelector('.ok-btn');
+const cancelBtn = document.querySelector('.cancel-btn');
+const reaBtn = document.querySelector('.rea-btn');
 
 let currentBedId = null;
+let currentState = null;
 
 Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
   const room = document.createElement('div');
   room.className='room';
-
-  const title = document.createElement('div');
-  title.className='room-title';
-  title.innerText='Палата '+roomNum;
-
+  room.innerHTML=`<div class="room-title">Палата ${roomNum}</div>`;
   const bedsDiv = document.createElement('div');
   bedsDiv.className='beds';
 
   for(let i=1;i<=bedCount;i++){
-    const bed = document.createElement('div');
+    const bed=document.createElement('div');
     bed.className='bed';
     bed.innerText=i;
-
-    const bedId=`r${roomNum}-l${i}`;
-    bed.dataset.id=bedId;
-    bedsList.push(bedId);
+    const id=`r${roomNum}-l${i}`;
+    bed.dataset.id=id;
 
     bed.onclick=()=>{
-      const isOccupied = bed.classList.contains('occupied');
-      const newState = isOccupied ? 'Вільно' : 'Зайнято';
-      currentBedId = bedId;
+      currentBedId=id;
+      currentState=bed.classList.contains('reanimation')?'reanimation':
+                   bed.classList.contains('occupied')?'occupied':'free';
 
-      // 🔥 тут додаємо стиль як кнопку
-      const stateClass = newState==='Вільно' ? 'state-free' : 'state-occupied';
-      modalText.innerHTML = `Змінити Ліжко №${i} в Палаті ${roomNum} на <span class="${stateClass}">${newState}</span>?`;
+      modalText.innerText=`Змінити стан ліжка №${i}?`;
+
+      if(currentState==='reanimation'){
+        reaBtn.innerText='З реанімації';
+        reaBtn.disabled=false;
+      }
+      else if(currentState==='occupied'){
+        reaBtn.innerText='До реанімації';
+        reaBtn.disabled=false;
+      }
+      else{
+        reaBtn.innerText='До реанімації';
+        reaBtn.disabled=true;
+      }
 
       modal.style.display='flex';
     };
@@ -256,42 +242,72 @@ Object.entries(wardStructure).forEach(([roomNum, bedCount])=>{
     bedsDiv.appendChild(bed);
   }
 
-  room.appendChild(title);
   room.appendChild(bedsDiv);
   wardsDiv.appendChild(room);
 });
 
-db.ref('beds').once('value', snapshot => {
-  if (!snapshot.exists()) {
-    const initialData = {};
-    bedsList.forEach(id => initialData[id] = 'free');
-    db.ref('beds').set(initialData);
-  }
-});
-
-db.ref('beds').on('value', snapshot=>{
-  const data=snapshot.val()||{};
-  let total=0, occupied=0;
+db.ref('beds').on('value', snap=>{
+  const data=snap.val()||{};
+  let total=0, occupied=0, rea=0;
 
   document.querySelectorAll('.bed').forEach(b=>{
-    const state = data[b.dataset.id];
+    const state=data[b.dataset.id];
     total++;
-    if(state==='occupied') occupied++;
-    b.classList.toggle('occupied', state==='occupied');
+    b.classList.remove('occupied','reanimation');
+
+    if(state==='occupied'){ b.classList.add('occupied'); occupied++; }
+    if(state==='reanimation'){ b.classList.add('reanimation'); rea++; }
   });
 
-  document.getElementById('totalCount').innerText = total;
-  document.getElementById('occupiedCount').innerText = occupied;
-  document.getElementById('freeCount').innerText = total - occupied;
+  document.getElementById('totalCount').innerText=total;
+  document.getElementById('occupiedCount').innerText=occupied;
+  document.getElementById('freeCount').innerText=total-occupied-rea;
+  document.getElementById('reanimationCount').innerText=rea;
 });
 
 okBtn.onclick=()=>{
-  if(currentBedId)
-    db.ref('beds/'+currentBedId).transaction(c=>c==='occupied'?'free':'occupied');
+  if(!currentBedId) return;
+
+  if(currentState==='reanimation'){
+    modal.style.display='none';
+    return;
+  }
+
+  db.ref('beds/'+currentBedId).set(
+    currentState==='occupied'?'free':'occupied'
+  );
+
   modal.style.display='none';
 };
 
 cancelBtn.onclick=()=> modal.style.display='none';
+
+reaBtn.onclick=()=>{
+  if(!currentBedId || reaBtn.disabled){
+    modal.style.display='none';
+    return;
+  }
+
+  if(currentState==='reanimation'){
+    db.ref('beds/'+currentBedId).set('occupied');
+    modal.style.display='none';
+    return;
+  }
+
+  db.ref('beds').once('value', snap=>{
+    const data=snap.val()||{};
+    const reaCount=Object.values(data).filter(v=>v==='reanimation').length;
+
+    if(reaCount>=MAX_REA){
+      alert('В реанімації може бути максимум 6 ліжок!');
+      modal.style.display='none';
+      return;
+    }
+
+    db.ref('beds/'+currentBedId).set('reanimation');
+    modal.style.display='none';
+  });
+};
 </script>
 </body>
 </html>
